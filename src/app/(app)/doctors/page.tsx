@@ -1,18 +1,25 @@
 import Link from "next/link";
 import { requireUserId } from "@/lib/auth";
 import { listDoctors } from "@/lib/queries/doctors";
+import { getDoctorFieldSuggestions } from "@/lib/queries/suggestions";
 import { DoctorFormDialog } from "@/components/doctors/doctor-form-dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default async function DoctorsPage() {
   const ownerId = await requireUserId();
-  const doctors = await listDoctors(ownerId);
+  const [doctors, suggestions] = await Promise.all([
+    listDoctors(ownerId),
+    getDoctorFieldSuggestions(ownerId),
+  ]);
 
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold">Doctors</h1>
-        <DoctorFormDialog />
+        <DoctorFormDialog
+          clinicSuggestions={suggestions.clinics}
+          citySuggestions={suggestions.cities}
+        />
       </div>
 
       {doctors.length === 0 ? (

@@ -70,6 +70,42 @@ export async function updateDoctor(
   return { success: true };
 }
 
+type InlineDoctorResult =
+  | { success: true; doctor: { id: string; name: string; specialty: string | null } }
+  | { success: false; error: string };
+
+/**
+ * Creates a doctor without redirecting, for the "add a new doctor without
+ * leaving this form" flow in ConsultationFormDialog. Only takes the fields
+ * that matter in the moment (name, specialty) — clinic/city/phone/notes
+ * can be filled in later from the Doctors page.
+ */
+export async function createDoctorInline(input: {
+  name: string;
+  specialty?: string;
+}): Promise<InlineDoctorResult> {
+  const ownerId = await requireUserId();
+  const parsed = doctorSchema.safeParse({
+    name: input.name,
+    specialty: input.specialty,
+  });
+
+  if (!parsed.success) {
+    return {
+      success: false,
+      error: parsed.error.issues[0]?.message ?? "Invalid doctor",
+    };
+  }
+
+  const [created] = await db
+    .insert(doctors)
+    .values({ ...parsed.data, ownerId })
+    .returning({ id: doctors.id, name: doctors.name, specialty: doctors.specialty });
+
+  revalidatePath("/doctors");
+  return { success: true, doctor: created };
+}
+
 export async function deleteDoctor(doctorId: string): Promise<ActionResult> {
   const ownerId = await requireUserId();
 

@@ -3,6 +3,11 @@ import { notFound } from "next/navigation";
 import { requireUserId } from "@/lib/auth";
 import { getConsultationWithDetails } from "@/lib/queries/consultations";
 import { listDoctors } from "@/lib/queries/doctors";
+import {
+  getConsultationReasonSuggestions,
+  getMedicationNameSuggestions,
+  getTestNameSuggestions,
+} from "@/lib/queries/suggestions";
 import { deleteConsultation } from "@/lib/actions/consultations";
 import { deletePrescription } from "@/lib/actions/prescriptions";
 import { deleteTestResult } from "@/lib/actions/test-results";
@@ -28,10 +33,14 @@ export default async function ConsultationDetailPage({
 }) {
   const { consultationId } = await params;
   const ownerId = await requireUserId();
-  const [consultation, doctors] = await Promise.all([
-    getConsultationWithDetails(ownerId, consultationId),
-    listDoctors(ownerId),
-  ]);
+  const [consultation, doctors, reasonSuggestions, medicationNameSuggestions, testNameSuggestions] =
+    await Promise.all([
+      getConsultationWithDetails(ownerId, consultationId),
+      listDoctors(ownerId),
+      getConsultationReasonSuggestions(ownerId),
+      getMedicationNameSuggestions(ownerId),
+      getTestNameSuggestions(ownerId),
+    ]);
 
   if (!consultation) notFound();
 
@@ -54,6 +63,7 @@ export default async function ConsultationDetailPage({
           <ConsultationFormDialog
             caseId={consultation.caseId}
             doctors={doctors}
+            reasonSuggestions={reasonSuggestions}
             consultation={consultation}
           />
           <DeleteConfirmButton
@@ -75,7 +85,10 @@ export default async function ConsultationDetailPage({
 
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold">Prescriptions</h2>
-        <PrescriptionFormDialog consultationId={consultation.id} />
+        <PrescriptionFormDialog
+          consultationId={consultation.id}
+          medicationNameSuggestions={medicationNameSuggestions}
+        />
       </div>
       {consultation.prescriptions.length === 0 ? (
         <p className="text-muted-foreground">No prescriptions logged for this visit.</p>
@@ -90,6 +103,7 @@ export default async function ConsultationDetailPage({
                     <PrescriptionFormDialog
                       consultationId={consultation.id}
                       prescription={prescription}
+                      medicationNameSuggestions={medicationNameSuggestions}
                     />
                     <DeleteConfirmButton
                       action={deletePrescription.bind(null, prescription.id, consultation.id)}
@@ -131,7 +145,10 @@ export default async function ConsultationDetailPage({
 
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold">Test results</h2>
-        <TestResultFormDialog consultationId={consultation.id} />
+        <TestResultFormDialog
+          consultationId={consultation.id}
+          testNameSuggestions={testNameSuggestions}
+        />
       </div>
       {consultation.testResults.length === 0 ? (
         <p className="text-muted-foreground">No test results logged for this visit.</p>
@@ -151,6 +168,7 @@ export default async function ConsultationDetailPage({
                     <TestResultFormDialog
                       consultationId={consultation.id}
                       testResult={testResult}
+                      testNameSuggestions={testNameSuggestions}
                     />
                     <DeleteConfirmButton
                       action={deleteTestResult.bind(null, testResult.id, consultation.id)}

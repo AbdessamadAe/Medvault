@@ -18,6 +18,12 @@ tool — it stores and organizes information you enter yourself.
 - Body system tags on Cases (fixed list of ~15 broad body systems, e.g.
   Digestive, Respiratory, Musculoskeletal — not specific anatomy), 0 or
   more per case, with filter chips to browse Cases by tag.
+- Low-friction data entry: suggestion dropdowns (via `<datalist>`, so a
+  custom value can always still be typed) for doctor specialty and
+  medication frequency (fixed curated lists), and for clinic, city, visit
+  reason, medication name, and test name (suggested from the user's own
+  previously-entered values). Creating a Consultation lets you add a new
+  doctor (name + specialty) inline, without leaving the form.
 - Weekly automated backups (DB dump + storage files) to a separate location.
 - "Export all my data" (JSON + original files as a zip).
 - PWA installability (manifest, icons, home-screen install) — **not** the

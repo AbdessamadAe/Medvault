@@ -13,8 +13,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { SubmitButton } from "@/components/submit-button";
+import { DatalistInput } from "@/components/datalist-input";
 import { createPrescription, updatePrescription } from "@/lib/actions/prescriptions";
 import { PlusIcon, XIcon } from "lucide-react";
+import { COMMON_FREQUENCIES } from "@/lib/medication-frequencies";
 
 const initialState = { success: false as const, error: "" };
 
@@ -54,9 +56,11 @@ type ExistingPrescription = {
 
 export function PrescriptionFormDialog({
   consultationId,
+  medicationNameSuggestions = [],
   prescription,
 }: {
   consultationId: string;
+  medicationNameSuggestions?: string[];
   prescription?: ExistingPrescription;
 }) {
   const [open, setOpen] = useState(false);
@@ -124,10 +128,11 @@ export function PrescriptionFormDialog({
                     </Button>
                   )}
                 </div>
-                <Input
+                <DatalistInput
                   placeholder="Name"
                   value={row.name}
                   onChange={(e) => updateMedication(index, "name", e.target.value)}
+                  options={medicationNameSuggestions}
                   required
                 />
                 <div className="grid grid-cols-2 gap-2">
@@ -136,10 +141,11 @@ export function PrescriptionFormDialog({
                     value={row.dosage}
                     onChange={(e) => updateMedication(index, "dosage", e.target.value)}
                   />
-                  <Input
+                  <DatalistInput
                     placeholder="Frequency (e.g. 2x/day)"
                     value={row.frequency}
                     onChange={(e) => updateMedication(index, "frequency", e.target.value)}
+                    options={COMMON_FREQUENCIES}
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-2">

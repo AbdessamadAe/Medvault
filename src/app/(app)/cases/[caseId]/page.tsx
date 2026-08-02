@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { requireUserId } from "@/lib/auth";
 import { getCaseWithHistory } from "@/lib/queries/cases";
 import { listDoctors } from "@/lib/queries/doctors";
+import { getConsultationReasonSuggestions } from "@/lib/queries/suggestions";
 import { deleteCase } from "@/lib/actions/cases";
 import { CaseFormDialog } from "@/components/cases/case-form-dialog";
 import { ConsultationFormDialog } from "@/components/consultations/consultation-form-dialog";
@@ -25,9 +26,10 @@ export default async function CaseDetailPage({
 }) {
   const { caseId } = await params;
   const ownerId = await requireUserId();
-  const [caseItem, doctors] = await Promise.all([
+  const [caseItem, doctors, reasonSuggestions] = await Promise.all([
     getCaseWithHistory(ownerId, caseId),
     listDoctors(ownerId),
+    getConsultationReasonSuggestions(ownerId),
   ]);
 
   if (!caseItem) notFound();
@@ -72,7 +74,11 @@ export default async function CaseDetailPage({
 
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold">Consultations</h2>
-        <ConsultationFormDialog caseId={caseItem.id} doctors={doctors} />
+        <ConsultationFormDialog
+          caseId={caseItem.id}
+          doctors={doctors}
+          reasonSuggestions={reasonSuggestions}
+        />
       </div>
 
       {caseItem.consultations.length === 0 ? (

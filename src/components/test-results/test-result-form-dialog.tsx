@@ -20,6 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { SubmitButton } from "@/components/submit-button";
+import { DatalistInput } from "@/components/datalist-input";
 import { createTestResult, updateTestResult } from "@/lib/actions/test-results";
 import { PlusIcon } from "lucide-react";
 import type { testResults } from "@/db/schema";
@@ -28,9 +29,11 @@ const initialState = { success: false as const, error: "" };
 
 export function TestResultFormDialog({
   consultationId,
+  testNameSuggestions = [],
   testResult,
 }: {
   consultationId: string;
+  testNameSuggestions?: string[];
   testResult?: typeof testResults.$inferSelect;
 }) {
   const [open, setOpen] = useState(false);
@@ -71,11 +74,12 @@ export function TestResultFormDialog({
           </div>
           <div className="flex flex-col gap-2">
             <Label htmlFor="testName">Test name</Label>
-            <Input
+            <DatalistInput
               id="testName"
               name="testName"
               placeholder="e.g. Complete Blood Count, Chest X-Ray"
               defaultValue={testResult?.testName}
+              options={testNameSuggestions}
               required
             />
           </div>

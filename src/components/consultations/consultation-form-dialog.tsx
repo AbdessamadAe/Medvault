@@ -1,6 +1,7 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useState, useTransition } from "react";
+import { toast } from "sonner";
 import {
   Dialog,
   DialogContent,
@@ -20,26 +21,63 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { SubmitButton } from "@/components/submit-button";
+import { DatalistInput } from "@/components/datalist-input";
 import { createConsultation, updateConsultation } from "@/lib/actions/consultations";
-import { PlusIcon } from "lucide-react";
+import { createDoctorInline } from "@/lib/actions/doctors";
+import { PlusIcon, XIcon } from "lucide-react";
 import type { consultations } from "@/db/schema";
+import { COMMON_SPECIALTIES } from "@/lib/specialties";
 
 const initialState = { success: false as const, error: "" };
+
+type DoctorOption = { id: string; name: string; specialty: string | null };
 
 export function ConsultationFormDialog({
   caseId,
   doctors,
+  reasonSuggestions = [],
   consultation,
 }: {
   caseId: string;
-  doctors: { id: string; name: string; specialty: string | null }[];
+  doctors: DoctorOption[];
+  reasonSuggestions?: string[];
   consultation?: typeof consultations.$inferSelect;
 }) {
   const [open, setOpen] = useState(false);
+  const [doctorOptions, setDoctorOptions] = useState<DoctorOption[]>(doctors);
+  const [selectedDoctorId, setSelectedDoctorId] = useState(consultation?.doctorId ?? "");
+  const [isAddingDoctor, setIsAddingDoctor] = useState(false);
+  const [newDoctorName, setNewDoctorName] = useState("");
+  const [newDoctorSpecialty, setNewDoctorSpecialty] = useState("");
+  const [isAddingDoctorPending, startAddDoctorTransition] = useTransition();
+
   const action = consultation
     ? updateConsultation.bind(null, consultation.id, caseId)
     : createConsultation;
   const [state, formAction] = useActionState(action, initialState);
+
+  function handleAddDoctor() {
+    const name = newDoctorName.trim();
+    if (!name) return;
+
+    startAddDoctorTransition(async () => {
+      const result = await createDoctorInline({
+        name,
+        specialty: newDoctorSpecialty.trim() || undefined,
+      });
+
+      if (!result.success) {
+        toast.error(result.error);
+        return;
+      }
+
+      setDoctorOptions((prev) => [...prev, result.doctor]);
+      setSelectedDoctorId(result.doctor.id);
+      setIsAddingDoctor(false);
+      setNewDoctorName("");
+      setNewDoctorSpecialty("");
+    });
+  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -57,14 +95,18 @@ export function ConsultationFormDialog({
         </DialogHeader>
         <form action={formAction} className="flex flex-col gap-4">
           <input type="hidden" name="caseId" value={caseId} />
+          <input type="hidden" name="doctorId" value={selectedDoctorId} />
           <div className="flex flex-col gap-2">
             <Label htmlFor="doctorId">Doctor</Label>
-            <Select name="doctorId" defaultValue={consultation?.doctorId}>
+            <Select
+              value={selectedDoctorId}
+              onValueChange={(value) => setSelectedDoctorId(value ?? "")}
+            >
               <SelectTrigger id="doctorId" className="w-full">
                 <SelectValue placeholder="Select a doctor" />
               </SelectTrigger>
               <SelectContent>
-                {doctors.map((doctor) => (
+                {doctorOptions.map((doctor) => (
                   <SelectItem key={doctor.id} value={doctor.id}>
                     {doctor.name}
                     {doctor.specialty ? ` — ${doctor.specialty}` : ""}
@@ -72,10 +114,54 @@ export function ConsultationFormDialog({
                 ))}
               </SelectContent>
             </Select>
-            {doctors.length === 0 && (
-              <p className="text-xs text-muted-foreground">
-                Add a doctor first from the Doctors page.
-              </p>
+
+            {!isAddingDoctor ? (
+              <Button
+                type="button"
+                variant="link"
+                size="sm"
+                className="w-fit px-0"
+                onClick={() => setIsAddingDoctor(true)}
+              >
+                <PlusIcon className="size-4" />
+                Add a new doctor
+              </Button>
+            ) : (
+              <div className="flex flex-col gap-2 rounded-md border p-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-medium text-muted-foreground">New doctor</span>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setIsAddingDoctor(false)}
+                  >
+                    <XIcon className="size-4" />
+                  </Button>
+                </div>
+                <Input
+                  placeholder="Doctor name"
+                  value={newDoctorName}
+                  onChange={(e) => setNewDoctorName(e.target.value)}
+                />
+                <DatalistInput
+                  placeholder="Specialty (optional)"
+                  value={newDoctorSpecialty}
+                  onChange={(e) => setNewDoctorSpecialty(e.target.value)}
+                  options={COMMON_SPECIALTIES}
+                />
+                <Button
+                  type="button"
+                  size="sm"
+                  disabled={!newDoctorName.trim() || isAddingDoctorPending}
+                  onClick={handleAddDoctor}
+                >
+                  Add doctor
+                </Button>
+                <p className="text-xs text-muted-foreground">
+                  You can add clinic, city, and phone later from the Doctors page.
+                </p>
+              </div>
             )}
           </div>
           <div className="flex flex-col gap-2">
@@ -84,7 +170,13 @@ export function ConsultationFormDialog({
           </div>
           <div className="flex flex-col gap-2">
             <Label htmlFor="reason">Reason for visit</Label>
-            <Input id="reason" name="reason" defaultValue={consultation?.reason} required />
+            <DatalistInput
+              id="reason"
+              name="reason"
+              defaultValue={consultation?.reason}
+              options={reasonSuggestions}
+              required
+            />
           </div>
           <div className="flex flex-col gap-2">
             <Label htmlFor="notes">Notes</Label>
@@ -100,7 +192,7 @@ export function ConsultationFormDialog({
               {state.error}
             </p>
           )}
-          <SubmitButton className="w-full" disabled={doctors.length === 0}>
+          <SubmitButton className="w-full" disabled={!selectedDoctorId}>
             {consultation ? "Save changes" : "Create consultation"}
           </SubmitButton>
         </form>

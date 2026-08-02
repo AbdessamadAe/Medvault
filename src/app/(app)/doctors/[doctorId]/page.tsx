@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireUserId } from "@/lib/auth";
 import { getDoctorWithHistory } from "@/lib/queries/doctors";
+import { getDoctorFieldSuggestions } from "@/lib/queries/suggestions";
 import { deleteDoctor } from "@/lib/actions/doctors";
 import { DoctorFormDialog } from "@/components/doctors/doctor-form-dialog";
 import { DeleteConfirmButton } from "@/components/delete-confirm-button";
@@ -15,7 +16,10 @@ export default async function DoctorDetailPage({
 }) {
   const { doctorId } = await params;
   const ownerId = await requireUserId();
-  const doctor = await getDoctorWithHistory(ownerId, doctorId);
+  const [doctor, suggestions] = await Promise.all([
+    getDoctorWithHistory(ownerId, doctorId),
+    getDoctorFieldSuggestions(ownerId),
+  ]);
 
   if (!doctor) notFound();
 
@@ -31,7 +35,11 @@ export default async function DoctorDetailPage({
           </p>
         </div>
         <div className="flex gap-2">
-          <DoctorFormDialog doctor={doctor} />
+          <DoctorFormDialog
+            doctor={doctor}
+            clinicSuggestions={suggestions.clinics}
+            citySuggestions={suggestions.cities}
+          />
           <DeleteConfirmButton action={deleteDoctor.bind(null, doctor.id)} itemLabel="this doctor" />
         </div>
       </div>
