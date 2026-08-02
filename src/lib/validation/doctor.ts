@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { optionalText, requiredText } from "./shared";
+import { optionalText, optionalUrl, requiredText } from "./shared";
 
 export const doctorSchema = z.object({
   name: requiredText(200),
@@ -7,6 +7,7 @@ export const doctorSchema = z.object({
   clinic: optionalText(200),
   city: optionalText(120),
   phone: optionalText(40),
+  mapsUrl: optionalUrl(2000),
   notes: optionalText(5000),
 });
 

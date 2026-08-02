@@ -16,6 +16,7 @@ function parseDoctorForm(formData: FormData) {
     clinic: formData.get("clinic"),
     city: formData.get("city"),
     phone: formData.get("phone"),
+    mapsUrl: formData.get("mapsUrl"),
     notes: formData.get("notes"),
   });
 }

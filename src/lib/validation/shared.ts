@@ -33,3 +33,16 @@ export function optionalText(maxLength: number) {
 }
 
 export const uuid = z.uuid("Invalid identifier");
+
+export function optionalUrl(maxLength: number) {
+  return z
+    .string()
+    .trim()
+    .max(maxLength, `Must be ${maxLength} characters or fewer`)
+    .optional()
+    .or(z.literal(""))
+    .transform((value) => (value ? value : undefined))
+    .refine((value) => value === undefined || /^https?:\/\//i.test(value), {
+      message: "Enter a valid URL starting with http:// or https://",
+    });
+}

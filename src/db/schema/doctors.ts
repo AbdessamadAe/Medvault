@@ -8,6 +8,7 @@ export const doctors = pgTable("doctors", {
   clinic: text("clinic"),
   city: text("city"),
   phone: text("phone"),
+  mapsUrl: text("maps_url"),
   notes: text("notes"),
   ...ownedRowColumns,
 });

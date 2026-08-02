@@ -9,7 +9,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -17,7 +17,7 @@ import { SubmitButton } from "@/components/submit-button";
 import { DatalistInput } from "@/components/datalist-input";
 import { createDoctor, updateDoctor } from "@/lib/actions/doctors";
 import { lookupGoogleMapsLink } from "@/lib/actions/maps-lookup";
-import { MapPinIcon, PlusIcon } from "lucide-react";
+import { ExternalLinkIcon, MapPinIcon, PlusIcon } from "lucide-react";
 import type { doctors } from "@/db/schema";
 import { COMMON_SPECIALTIES } from "@/lib/specialties";
 
@@ -35,7 +35,7 @@ export function DoctorFormDialog({
   const [open, setOpen] = useState(false);
   const [clinic, setClinic] = useState(doctor?.clinic ?? "");
   const [city, setCity] = useState(doctor?.city ?? "");
-  const [mapsUrl, setMapsUrl] = useState("");
+  const [mapsUrl, setMapsUrl] = useState(doctor?.mapsUrl ?? "");
   const [isLookingUpMaps, startMapsLookup] = useTransition();
 
   const action = doctor ? updateDoctor.bind(null, doctor.id) : createDoctor;
@@ -74,32 +74,43 @@ export function DoctorFormDialog({
         <DialogHeader>
           <DialogTitle>{doctor ? "Edit doctor" : "New doctor"}</DialogTitle>
         </DialogHeader>
-
-        <div className="flex flex-col gap-2 rounded-md border p-3">
-          <Label htmlFor="mapsUrl" className="text-xs text-muted-foreground">
-            Paste a Google Maps link to fill in clinic &amp; city (optional)
-          </Label>
-          <div className="flex gap-2">
-            <Input
-              id="mapsUrl"
-              placeholder="https://maps.app.goo.gl/..."
-              value={mapsUrl}
-              onChange={(e) => setMapsUrl(e.target.value)}
-            />
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              disabled={!mapsUrl.trim() || isLookingUpMaps}
-              onClick={handleMapsLookup}
-            >
-              <MapPinIcon className="size-4" />
-              Fill in
-            </Button>
-          </div>
-        </div>
-
         <form action={formAction} className="flex flex-col gap-4">
+          <div className="flex flex-col gap-2 rounded-md border p-3">
+            <Label htmlFor="mapsUrl" className="text-xs text-muted-foreground">
+              Google Maps link (optional) — paste to fill in clinic &amp; city, and to keep
+              a one-click link to the location
+            </Label>
+            <div className="flex gap-2">
+              <Input
+                id="mapsUrl"
+                name="mapsUrl"
+                placeholder="https://maps.app.goo.gl/..."
+                value={mapsUrl}
+                onChange={(e) => setMapsUrl(e.target.value)}
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={!mapsUrl.trim() || isLookingUpMaps}
+                onClick={handleMapsLookup}
+              >
+                <MapPinIcon className="size-4" />
+                Fill in
+              </Button>
+              {mapsUrl.trim() && (
+                <a
+                  href={mapsUrl.trim()}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={buttonVariants({ variant: "ghost", size: "icon" })}
+                >
+                  <ExternalLinkIcon className="size-4" />
+                </a>
+              )}
+            </div>
+          </div>
+
           <div className="flex flex-col gap-2">
             <Label htmlFor="name">Name</Label>
             <Input id="name" name="name" defaultValue={doctor?.name} required />

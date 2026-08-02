@@ -26,8 +26,10 @@ tool — it stores and organizes information you enter yourself.
   doctor (name + specialty) inline, without leaving the form.
 - Paste a Google Maps link on the Doctor form to pre-fill clinic name and
   city (free: URL parsing + OpenStreetMap reverse geocoding, no account
-  or API key). Doesn't extract phone number or a full street address —
-  those aren't reliably present in the link itself. Always shown as an
+  or API key). The link itself is also saved on the doctor record, with a
+  one-click "View on Google Maps" link on the Doctor detail page. Doesn't
+  extract phone number or a full street address — those aren't reliably
+  present in the link itself. Always shown as an
   editable pre-fill, never saved without review.
 - Weekly automated backups (DB dump + storage files) to a separate location.
 - "Export all my data" (JSON + original files as a zip).
@@ -63,7 +65,7 @@ Attachment — polymorphic-by-FK: belongs to exactly one of
 | Entity | Fields | Required | Optional |
 |---|---|---|---|
 | Case | title, status (active/resolved/chronic), start_date, end_date, notes, body_systems (0+ tags from a fixed list) | title | status, dates, notes, body_systems |
-| Doctor | name, specialty, clinic, city, phone, notes | name | rest |
+| Doctor | name, specialty, clinic, city, phone, maps_url, notes | name | rest |
 | Consultation | date, case_id, doctor_id, reason, notes | date, case, doctor, reason | notes |
 | Prescription | date, consultation_id, notes | date, consultation, ≥1 medication | notes |
 | Medication | name, dosage, frequency, start_date, end_date, notes | name | rest |

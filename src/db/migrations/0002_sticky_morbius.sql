@@ -1,0 +1,1 @@
+ALTER TABLE "doctors" ADD COLUMN "maps_url" text;

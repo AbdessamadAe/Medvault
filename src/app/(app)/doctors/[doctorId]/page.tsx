@@ -8,6 +8,7 @@ import { DoctorFormDialog } from "@/components/doctors/doctor-form-dialog";
 import { DeleteConfirmButton } from "@/components/delete-confirm-button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { MapPinIcon } from "lucide-react";
 
 export default async function DoctorDetailPage({
   params,
@@ -33,6 +34,17 @@ export default async function DoctorDetailPage({
               .filter(Boolean)
               .join(" · ")}
           </p>
+          {doctor.mapsUrl && (
+            <a
+              href={doctor.mapsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
+            >
+              <MapPinIcon className="size-3.5" />
+              View on Google Maps
+            </a>
+          )}
         </div>
         <div className="flex gap-2">
           <DoctorFormDialog
