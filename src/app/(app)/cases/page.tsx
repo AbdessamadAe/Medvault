@@ -40,11 +40,11 @@ export default async function CasesPage({
         <CaseFormDialog />
       </div>
 
-      <div className="flex flex-wrap gap-2">
+      <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         <Link
           href="/cases"
           className={cn(
-            "rounded-full border px-3 py-1 text-sm transition-colors hover:bg-accent",
+            "shrink-0 rounded-full border px-3 py-1.5 text-sm whitespace-nowrap transition-colors hover:bg-accent",
             !activeFilter && "border-primary bg-primary text-primary-foreground",
           )}
         >
@@ -55,7 +55,7 @@ export default async function CasesPage({
             key={value}
             href={`/cases?system=${value}`}
             className={cn(
-              "rounded-full border px-3 py-1 text-sm transition-colors hover:bg-accent",
+              "shrink-0 rounded-full border px-3 py-1.5 text-sm whitespace-nowrap transition-colors hover:bg-accent",
               activeFilter === value && "border-primary bg-primary text-primary-foreground",
             )}
           >

@@ -26,6 +26,10 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: "#16803c",
+  // Lets the page extend under the iPhone notch/home indicator so
+  // env(safe-area-inset-*) resolves to real values instead of 0 — used by
+  // the bottom tab bar and top bar to avoid sitting under those areas.
+  viewportFit: "cover",
 };
 
 export default function RootLayout({

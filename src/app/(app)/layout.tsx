@@ -1,10 +1,14 @@
 import { NavBar } from "@/components/layout/nav-bar";
+import { BottomTabBar } from "@/components/layout/bottom-tab-bar";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-full flex-1 flex-col">
       <NavBar />
-      <main className="mx-auto w-full max-w-4xl flex-1 px-4 py-6">{children}</main>
+      <main className="mx-auto w-full max-w-4xl flex-1 px-4 py-6 pb-[calc(5rem+env(safe-area-inset-bottom))]">
+        {children}
+      </main>
+      <BottomTabBar />
     </div>
   );
 }
