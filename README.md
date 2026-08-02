@@ -52,19 +52,31 @@ npm run backup         # run the same backup the weekly GitHub Action runs
 
 ## Deployment
 
-1. **Create a Supabase project** (free tier). Note the project URL, anon
-   key, service role key, and both the pooled (6543) and direct (5432)
-   Postgres connection strings from Settings → Database.
+1. **Create a Supabase project** (free tier). From Settings → API Keys,
+   note the project URL, `publishable_key` (→
+   `NEXT_PUBLIC_SUPABASE_ANON_KEY`), and `secret_key` (→
+   `SUPABASE_SERVICE_ROLE_KEY`) — Supabase renamed the legacy anon/
+   service_role keys to these. From Settings → Database, note the
+   **Transaction pooler** string (→ `DATABASE_URL`) and the **Session
+   pooler** string (→ `MIGRATION_DATABASE_URL`). Use the Session pooler,
+   not "Direct connection", for `MIGRATION_DATABASE_URL` — the direct
+   connection is IPv6-only unless you've paid for Supabase's IPv4 add-on,
+   which hangs/times out from most IPv4-only environments (CI runners,
+   some sandboxes, etc).
 2. **Set local env vars**: copy `.env.example` to `.env.local` and fill in
    the values from step 1 (see [docs/ENVIRONMENT.md](docs/ENVIRONMENT.md)
    for what each one is for).
 3. **Run migrations**: `npm run db:migrate`.
-4. **Bootstrap security**: open the Supabase SQL editor and run
-   `src/db/rls-policies.sql` once — this enables Row Level Security on
-   every table and creates the private `medical-files` storage bucket
-   with its access policies.
+4. **Bootstrap security**: `npx tsx scripts/run-sql.ts src/db/rls-policies.sql`
+   — enables Row Level Security on every table and creates the private
+   `medical-files` storage bucket with its access policies. Sanity-check
+   with `npx tsx scripts/verify-rls.ts` (confirms RLS is on for all 8
+   tables, the bucket exists and is private, and all policies are
+   present).
 5. **Create your one account**: Supabase Dashboard → Authentication →
-   Users → Add user. There is no public sign-up route by design.
+   Users → Add user (check "Auto Confirm User"). There is no public
+   sign-up route by design — pick your own email/password directly in the
+   dashboard rather than sharing it anywhere else.
 6. **Deploy to Vercel**: import the repo, set the environment variables
    listed in [docs/ENVIRONMENT.md](docs/ENVIRONMENT.md) under "Vercel", and
    deploy.

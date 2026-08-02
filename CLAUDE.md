@@ -94,13 +94,16 @@ npm run db:generate   # diff src/db/schema against migrations/ (no DB connection
 npm run db:migrate    # apply migrations to MIGRATION_DATABASE_URL
 npm run db:studio     # Drizzle Studio, browse the real database
 npm run backup        # manual run of the same backup scripts/backup.ts CI runs weekly
+npx tsx scripts/run-sql.ts <file>    # run a one-off .sql file against MIGRATION_DATABASE_URL
+npx tsx scripts/verify-rls.ts        # confirm RLS + storage bucket + policies are all in place
 ```
 
-After `db:migrate`, run `src/db/rls-policies.sql` once in the Supabase SQL
-editor — it's a one-time bootstrap step (RLS + the private storage
-bucket), not a Drizzle-managed migration, so it isn't applied
-automatically. See [docs/BACKUP_RESTORE.md](docs/BACKUP_RESTORE.md) and
-the root [README.md](README.md) for the full deployment sequence.
+After `db:migrate`, run
+`npx tsx scripts/run-sql.ts src/db/rls-policies.sql` once — it's a
+one-time bootstrap step (RLS + the private storage bucket), not a
+Drizzle-managed migration, so it isn't applied automatically. See
+[docs/BACKUP_RESTORE.md](docs/BACKUP_RESTORE.md) and the root
+[README.md](README.md) for the full deployment sequence.
 
 ## Testing
 

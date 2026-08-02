@@ -6,10 +6,10 @@ Copy `.env.example` to `.env.local` for local development. Never commit
 | Variable | Used by | Notes |
 |---|---|---|
 | `NEXT_PUBLIC_SUPABASE_URL` | App, backup script | Public — safe to expose to the browser. Supabase project URL. |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | App | Public — safe to expose to the browser. RLS is what actually protects data, not secrecy of this key. |
-| `SUPABASE_SERVICE_ROLE_KEY` | Backup script only | **Secret.** Bypasses Row Level Security. Never used by the running app, never sent to the browser. |
-| `DATABASE_URL` | App (Drizzle client) | Pooled connection (port 6543, pgbouncer) from Supabase → Settings → Database. |
-| `MIGRATION_DATABASE_URL` | `drizzle-kit generate/migrate`, backup script | Direct connection (port 5432). Migrations and `pg_dump` need a direct connection, not the pooler. |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | App | Public — safe to expose to the browser. RLS is what actually protects data, not secrecy of this key. Supabase's dashboard now calls this the **publishable key** (`sb_publishable_...`) — same thing, drop-in value. |
+| `SUPABASE_SERVICE_ROLE_KEY` | Backup script only | **Secret.** Bypasses Row Level Security. Never used by the running app, never sent to the browser. Supabase's dashboard now calls this the **secret key** (`sb_secret_...`). |
+| `DATABASE_URL` | App (Drizzle client) | Transaction pooler connection (port 6543) from Supabase → Settings → Database. |
+| `MIGRATION_DATABASE_URL` | `drizzle-kit generate/migrate`, `scripts/run-sql.ts`, backup script | **Session pooler** connection string, not "Direct connection". The direct connection is IPv6-only unless you've bought Supabase's IPv4 add-on, and hangs/times out from IPv4-only environments (this bit us running migrations from a sandbox with no IPv6 route). The session pooler supports the session-level features migrations need, unlike the transaction pooler. |
 | `SUPABASE_STORAGE_BUCKET` | App, backup script | Defaults to `medical-files` if unset. Must match the bucket created by `src/db/rls-policies.sql`. |
 | `B2_ENDPOINT` | Backup script only | Backblaze B2 S3-compatible endpoint for your bucket's region. |
 | `B2_BUCKET_NAME` | Backup script only | The B2 bucket backups are uploaded to. |
