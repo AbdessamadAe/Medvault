@@ -1,10 +1,14 @@
-import { and, desc, eq } from "drizzle-orm";
+import { and, arrayContains, desc, eq } from "drizzle-orm";
 import { db } from "@/db";
 import { cases } from "@/db/schema";
+import type { BodySystem } from "@/lib/body-systems";
 
-export async function listCases(ownerId: string) {
+export async function listCases(ownerId: string, bodySystem?: BodySystem) {
   return db.query.cases.findMany({
-    where: eq(cases.ownerId, ownerId),
+    where: and(
+      eq(cases.ownerId, ownerId),
+      bodySystem ? arrayContains(cases.bodySystems, [bodySystem]) : undefined,
+    ),
     orderBy: [desc(cases.updatedAt)],
   });
 }

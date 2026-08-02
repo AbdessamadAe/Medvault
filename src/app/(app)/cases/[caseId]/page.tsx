@@ -10,6 +10,7 @@ import { DeleteConfirmButton } from "@/components/delete-confirm-button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { BODY_SYSTEM_LABELS } from "@/lib/body-systems";
 
 const STATUS_LABEL: Record<string, string> = {
   active: "Active",
@@ -56,6 +57,15 @@ export default async function CaseDetailPage({
           </div>
         </div>
         {caseItem.notes && <p className="whitespace-pre-wrap text-sm">{caseItem.notes}</p>}
+        {caseItem.bodySystems.length > 0 && (
+          <div className="flex flex-wrap gap-1">
+            {caseItem.bodySystems.map((value) => (
+              <Link key={value} href={`/cases?system=${value}`}>
+                <Badge variant="outline">{BODY_SYSTEM_LABELS[value]}</Badge>
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
 
       <Separator />

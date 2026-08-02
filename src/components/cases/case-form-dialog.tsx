@@ -23,6 +23,7 @@ import { SubmitButton } from "@/components/submit-button";
 import { createCase, updateCase } from "@/lib/actions/cases";
 import { PlusIcon } from "lucide-react";
 import type { cases } from "@/db/schema";
+import { BODY_SYSTEM_LABELS, BODY_SYSTEM_VALUES } from "@/lib/body-systems";
 
 const initialState = { success: false as const, error: "" };
 
@@ -83,6 +84,25 @@ export function CaseFormDialog({
                 type="date"
                 defaultValue={caseItem?.endDate ?? undefined}
               />
+            </div>
+          </div>
+          <div className="flex flex-col gap-2">
+            <Label>Body systems (optional)</Label>
+            <div className="flex flex-wrap gap-2">
+              {BODY_SYSTEM_VALUES.map((value) => (
+                <label key={value} className="cursor-pointer">
+                  <input
+                    type="checkbox"
+                    name="bodySystems"
+                    value={value}
+                    defaultChecked={caseItem?.bodySystems?.includes(value)}
+                    className="peer sr-only"
+                  />
+                  <span className="rounded-full border px-3 py-1 text-sm transition-colors peer-checked:border-primary peer-checked:bg-primary peer-checked:text-primary-foreground hover:bg-accent">
+                    {BODY_SYSTEM_LABELS[value]}
+                  </span>
+                </label>
+              ))}
             </div>
           </div>
           <div className="flex flex-col gap-2">

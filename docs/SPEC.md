@@ -15,6 +15,9 @@ tool — it stores and organizes information you enter yourself.
   picker only (no camera capture).
 - Basic free-text search across titles/notes/test names.
 - Browse-by-Case and Browse-by-Doctor navigation.
+- Body system tags on Cases (fixed list of ~15 broad body systems, e.g.
+  Digestive, Respiratory, Musculoskeletal — not specific anatomy), 0 or
+  more per case, with filter chips to browse Cases by tag.
 - Weekly automated backups (DB dump + storage files) to a separate location.
 - "Export all my data" (JSON + original files as a zip).
 - PWA installability (manifest, icons, home-screen install) — **not** the
@@ -48,7 +51,7 @@ Attachment — polymorphic-by-FK: belongs to exactly one of
 
 | Entity | Fields | Required | Optional |
 |---|---|---|---|
-| Case | title, status (active/resolved/chronic), start_date, end_date, notes | title | status, dates, notes |
+| Case | title, status (active/resolved/chronic), start_date, end_date, notes, body_systems (0+ tags from a fixed list) | title | status, dates, notes, body_systems |
 | Doctor | name, specialty, clinic, city, phone, notes | name | rest |
 | Consultation | date, case_id, doctor_id, reason, notes | date, case, doctor, reason | notes |
 | Prescription | date, consultation_id, notes | date, consultation, ≥1 medication | notes |

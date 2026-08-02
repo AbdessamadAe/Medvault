@@ -17,6 +17,7 @@ function parseCaseForm(formData: FormData) {
     startDate: formData.get("startDate"),
     endDate: formData.get("endDate"),
     notes: formData.get("notes"),
+    bodySystems: formData.getAll("bodySystems"),
   });
 }
 

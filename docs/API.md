@@ -11,7 +11,8 @@ and again by Postgres Row Level Security.
 
 ## Cases — `src/lib/actions/cases.ts`, `src/lib/queries/cases.ts`
 - `createCase`, `updateCase`, `deleteCase`
-- `listCases`, `getCaseWithHistory`, `listCasesForPicker`
+- `listCases(ownerId, bodySystem?)` — optional filter by one tag from
+  `src/lib/body-systems.ts`, `getCaseWithHistory`, `listCasesForPicker`
 
 ## Doctors — `src/lib/actions/doctors.ts`, `src/lib/queries/doctors.ts`
 - `createDoctor`, `updateDoctor`, `deleteDoctor` (blocked if the doctor has

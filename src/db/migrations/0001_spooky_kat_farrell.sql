@@ -1,0 +1,2 @@
+CREATE TYPE "public"."body_system" AS ENUM('digestive', 'respiratory', 'ent', 'cardiovascular', 'musculoskeletal', 'nervous', 'skin', 'eyes', 'dental', 'urinary', 'reproductive', 'endocrine', 'immune', 'mental_health', 'general');--> statement-breakpoint
+ALTER TABLE "cases" ADD COLUMN "body_systems" "body_system"[] DEFAULT ARRAY[]::body_system[] NOT NULL;

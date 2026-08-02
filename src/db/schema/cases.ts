@@ -1,6 +1,7 @@
+import { sql } from "drizzle-orm";
 import { date, pgTable, text, uuid } from "drizzle-orm/pg-core";
 import { ownedRowColumns } from "./columns.helpers";
-import { caseStatusEnum } from "./enums";
+import { bodySystemEnum, caseStatusEnum } from "./enums";
 
 export const cases = pgTable("cases", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -9,5 +10,9 @@ export const cases = pgTable("cases", {
   startDate: date("start_date"),
   endDate: date("end_date"),
   notes: text("notes"),
+  bodySystems: bodySystemEnum("body_systems")
+    .array()
+    .notNull()
+    .default(sql`ARRAY[]::body_system[]`),
   ...ownedRowColumns,
 });
