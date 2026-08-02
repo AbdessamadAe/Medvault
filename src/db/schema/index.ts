@@ -1,5 +1,5 @@
 export * from "./enums";
-export * from "./illnesses";
+export * from "./cases";
 export * from "./doctors";
 export * from "./consultations";
 export * from "./prescriptions";

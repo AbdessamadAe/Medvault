@@ -65,7 +65,7 @@ infrastructure" principle in docs/SPEC.md.
    Storage for a 60-second signed URL — the file is never reachable via a
    permanent or public link.
 3. Delete: the file is removed from Storage *before* the database row,
-   and before any cascading parent delete (illness/consultation/
+   and before any cascading parent delete (case/consultation/
    prescription/test result) — see `attachment-cascade.ts` — so deleting
    a parent record never orphans a file.
 
@@ -74,11 +74,11 @@ infrastructure" principle in docs/SPEC.md.
 See [SPEC.md](SPEC.md) for the full field-level table. In short:
 
 ```
-Illness ─┬─< Consultation >─┬─< Prescription >─< Medication (via join table)
-         │                  │
-         │                  └─< Test Result (type: lab | imaging)
-         │
-Doctor ──┘ (referenced by Consultation, not owned by Illness)
+Case ──┬─< Consultation >─┬─< Prescription >─< Medication (via join table)
+        │                 │
+        │                 └─< Test Result (type: lab | imaging)
+        │
+Doctor ─┘ (referenced by Consultation, not owned by Case)
 
 Attachment: belongs to exactly one of {Consultation, Prescription, Test
 Result} — enforced by a CHECK constraint, not just application logic.

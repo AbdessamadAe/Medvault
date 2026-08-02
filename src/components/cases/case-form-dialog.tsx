@@ -20,41 +20,41 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { SubmitButton } from "@/components/submit-button";
-import { createIllness, updateIllness } from "@/lib/actions/illnesses";
+import { createCase, updateCase } from "@/lib/actions/cases";
 import { PlusIcon } from "lucide-react";
-import type { illnesses } from "@/db/schema";
+import type { cases } from "@/db/schema";
 
 const initialState = { success: false as const, error: "" };
 
-export function IllnessFormDialog({
-  illness,
+export function CaseFormDialog({
+  caseItem,
 }: {
-  illness?: typeof illnesses.$inferSelect;
+  caseItem?: typeof cases.$inferSelect;
 }) {
   const [open, setOpen] = useState(false);
-  const action = illness ? updateIllness.bind(null, illness.id) : createIllness;
+  const action = caseItem ? updateCase.bind(null, caseItem.id) : createCase;
   const [state, formAction] = useActionState(action, initialState);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger
-        render={<Button variant={illness ? "outline" : "default"} size={illness ? "sm" : "default"} />}
+        render={<Button variant={caseItem ? "outline" : "default"} size={caseItem ? "sm" : "default"} />}
       >
-        {!illness && <PlusIcon className="size-4" />}
-        {illness ? "Edit" : "New illness"}
+        {!caseItem && <PlusIcon className="size-4" />}
+        {caseItem ? "Edit" : "New case"}
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{illness ? "Edit illness" : "New illness"}</DialogTitle>
+          <DialogTitle>{caseItem ? "Edit case" : "New case"}</DialogTitle>
         </DialogHeader>
         <form action={formAction} className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
             <Label htmlFor="title">Title</Label>
-            <Input id="title" name="title" defaultValue={illness?.title} required />
+            <Input id="title" name="title" defaultValue={caseItem?.title} required />
           </div>
           <div className="flex flex-col gap-2">
             <Label htmlFor="status">Status</Label>
-            <Select name="status" defaultValue={illness?.status ?? "active"}>
+            <Select name="status" defaultValue={caseItem?.status ?? "active"}>
               <SelectTrigger id="status" className="w-full">
                 <SelectValue />
               </SelectTrigger>
@@ -72,7 +72,7 @@ export function IllnessFormDialog({
                 id="startDate"
                 name="startDate"
                 type="date"
-                defaultValue={illness?.startDate ?? undefined}
+                defaultValue={caseItem?.startDate ?? undefined}
               />
             </div>
             <div className="flex flex-col gap-2">
@@ -81,20 +81,20 @@ export function IllnessFormDialog({
                 id="endDate"
                 name="endDate"
                 type="date"
-                defaultValue={illness?.endDate ?? undefined}
+                defaultValue={caseItem?.endDate ?? undefined}
               />
             </div>
           </div>
           <div className="flex flex-col gap-2">
             <Label htmlFor="notes">Notes</Label>
-            <Textarea id="notes" name="notes" defaultValue={illness?.notes ?? undefined} rows={4} />
+            <Textarea id="notes" name="notes" defaultValue={caseItem?.notes ?? undefined} rows={4} />
           </div>
           {!state.success && state.error && (
             <p className="text-sm text-destructive" role="alert">
               {state.error}
             </p>
           )}
-          <SubmitButton className="w-full">{illness ? "Save changes" : "Create illness"}</SubmitButton>
+          <SubmitButton className="w-full">{caseItem ? "Save changes" : "Create case"}</SubmitButton>
         </form>
       </DialogContent>
     </Dialog>

@@ -1,11 +1,11 @@
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
-import { doctors, illnesses } from "@/db/schema";
+import { cases, doctors } from "@/db/schema";
 
 export async function getAllDataForExport(ownerId: string) {
-  const [illnessRows, doctorRows] = await Promise.all([
-    db.query.illnesses.findMany({
-      where: eq(illnesses.ownerId, ownerId),
+  const [caseRows, doctorRows] = await Promise.all([
+    db.query.cases.findMany({
+      where: eq(cases.ownerId, ownerId),
       with: {
         consultations: {
           with: {
@@ -25,5 +25,5 @@ export async function getAllDataForExport(ownerId: string) {
     db.query.doctors.findMany({ where: eq(doctors.ownerId, ownerId) }),
   ]);
 
-  return { illnesses: illnessRows, doctors: doctorRows };
+  return { cases: caseRows, doctors: doctorRows };
 }

@@ -1,13 +1,13 @@
 import { date, pgTable, text, uuid } from "drizzle-orm/pg-core";
 import { ownedRowColumns } from "./columns.helpers";
-import { illnesses } from "./illnesses";
+import { cases } from "./cases";
 import { doctors } from "./doctors";
 
 export const consultations = pgTable("consultations", {
   id: uuid("id").primaryKey().defaultRandom(),
-  illnessId: uuid("illness_id")
+  caseId: uuid("case_id")
     .notNull()
-    .references(() => illnesses.id, { onDelete: "cascade" }),
+    .references(() => cases.id, { onDelete: "cascade" }),
   doctorId: uuid("doctor_id")
     .notNull()
     .references(() => doctors.id, { onDelete: "restrict" }),

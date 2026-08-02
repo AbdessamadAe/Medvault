@@ -9,9 +9,9 @@ All Server Actions require an authenticated session (`requireUserId()`)
 and every query is scoped to the signed-in user, both in the query itself
 and again by Postgres Row Level Security.
 
-## Illnesses — `src/lib/actions/illnesses.ts`, `src/lib/queries/illnesses.ts`
-- `createIllness`, `updateIllness`, `deleteIllness`
-- `listIllnesses`, `getIllnessWithHistory`, `listIllnessesForPicker`
+## Cases — `src/lib/actions/cases.ts`, `src/lib/queries/cases.ts`
+- `createCase`, `updateCase`, `deleteCase`
+- `listCases`, `getCaseWithHistory`, `listCasesForPicker`
 
 ## Doctors — `src/lib/actions/doctors.ts`, `src/lib/queries/doctors.ts`
 - `createDoctor`, `updateDoctor`, `deleteDoctor` (blocked if the doctor has
@@ -38,7 +38,7 @@ and again by Postgres Row Level Security.
   directly from a Client Component (not via a form)
 
 ## Search — `src/lib/queries/search.ts`
-- `searchRecords(ownerId, term)` — `ILIKE` across illness title/notes,
+- `searchRecords(ownerId, term)` — `ILIKE` across case title/notes,
   doctor name/notes, consultation reason/notes, test name/result notes.
   Called from the `/search` Server Component page via `?q=`.
 
@@ -47,7 +47,7 @@ and again by Postgres Row Level Security.
 
 ## Route Handlers (the only two non-Server-Action endpoints)
 - `GET /api/export` — streams a zip of all data as JSON + every original
-  attached file, organized by illness/consultation
+  attached file, organized by case/consultation
   (`src/app/api/export/route.ts`)
 - `src/app/manifest.ts`, `src/app/icon.tsx`, `src/app/apple-icon.tsx`,
   `src/app/icon-192/route.ts`, `src/app/icon-512/route.ts` — PWA manifest

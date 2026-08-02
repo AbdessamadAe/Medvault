@@ -1,9 +1,9 @@
 import { and, eq, ilike, or } from "drizzle-orm";
 import { db } from "@/db";
-import { consultations, doctors, illnesses, testResults } from "@/db/schema";
+import { cases, consultations, doctors, testResults } from "@/db/schema";
 
 export type SearchResult = {
-  type: "illness" | "doctor" | "consultation" | "test-result";
+  type: "case" | "doctor" | "consultation" | "test-result";
   id: string;
   title: string;
   href: string;
@@ -12,14 +12,14 @@ export type SearchResult = {
 export async function searchRecords(ownerId: string, term: string): Promise<SearchResult[]> {
   const pattern = `%${term}%`;
 
-  const [illnessRows, doctorRows, consultationRows, testResultRows] = await Promise.all([
+  const [caseRows, doctorRows, consultationRows, testResultRows] = await Promise.all([
     db
-      .select({ id: illnesses.id, title: illnesses.title })
-      .from(illnesses)
+      .select({ id: cases.id, title: cases.title })
+      .from(cases)
       .where(
         and(
-          eq(illnesses.ownerId, ownerId),
-          or(ilike(illnesses.title, pattern), ilike(illnesses.notes, pattern)),
+          eq(cases.ownerId, ownerId),
+          or(ilike(cases.title, pattern), ilike(cases.notes, pattern)),
         ),
       ),
     db
@@ -59,11 +59,11 @@ export async function searchRecords(ownerId: string, term: string): Promise<Sear
   ]);
 
   return [
-    ...illnessRows.map((row) => ({
-      type: "illness" as const,
+    ...caseRows.map((row) => ({
+      type: "case" as const,
       id: row.id,
       title: row.title,
-      href: `/illnesses/${row.id}`,
+      href: `/cases/${row.id}`,
     })),
     ...doctorRows.map((row) => ({
       type: "doctor" as const,

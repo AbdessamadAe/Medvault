@@ -5,12 +5,12 @@
 | Client platform (v1) | Native iOS app; responsive web app | Web app (Next.js), native iOS deferred | User explicitly redirected scope mid-project toward a web-first v1 | Yes — explicit user instruction |
 | Hosting/backend | Supabase (all-in-one) + Vercel; Neon+R2+NextAuth (decoupled) | Supabase + Vercel | Fewest moving parts for a one-person-operated project; built-in RLS and private storage | Yes |
 | Authentication | Email+password; passwordless email; Sign in with Apple; managed IdP | Supabase Auth, email+password, one manually-provisioned account | Simplest secure option for exactly one user; no public sign-up route | Yes |
-| Data model shape | Flat independent record types; illness-centric hierarchy | Illness → Consultation → {Prescription+Medications, Test Result}, Doctor as shared directory | Matches the user's description of the Moroccan healthcare visit flow they wanted to mirror | Yes |
-| Illness required on every record? | Always required; optional | Always required | User's explicit choice, with the tradeoff (needs a catch-all Illness for routine visits) flagged | Yes |
+| Data model shape | Flat independent record types; case-centric hierarchy | Case → Consultation → {Prescription+Medications, Test Result}, Doctor as shared directory | Matches the user's description of the Moroccan healthcare visit flow they wanted to mirror | Yes |
+| Case required on every record? | Always required; optional | Always required | User's explicit choice, with the tradeoff (needs a catch-all Case for routine visits) flagged | Yes |
 | Medications: separate entity or free text | Separate entity (reusable/linkable); free text on Prescription | Separate Medication entity + join table | User's explicit choice, for future cross-linking value | Yes |
 | Labs vs Imaging | One combined "Test Result" type; two separate types | Combined, with a `type` discriminator | User's explicit choice | Yes |
 | Doctor directory | Reusable directory; free text per consultation | Reusable directory | User's explicit choice, enables "all visits with Dr. X" | Yes |
-| Prescriptions/Test Results link depth | Always via a Consultation; optional direct-to-Illness | Always via a Consultation | User's explicit choice | Yes |
+| Prescriptions/Test Results link depth | Always via a Consultation; optional direct-to-Case | Always via a Consultation | User's explicit choice | Yes |
 | Backup strategy | Automated scheduled export; upgrade to Supabase Pro; manual export | Automated weekly export (GitHub Actions) to Backblaze B2 | User chose this over paying for Supabase Pro, given free-tier budget preference | Yes |
 | Backup cadence vs. stated tolerance | Weekly, monthly | Weekly | User said "up to a month" tolerable; weekly gives comfortable margin at no extra cost | Implementation detail within an approved category |
 | API layer | Separate REST API; Server Actions only | Server Actions (no REST API yet) | No client other than this Next.js app exists yet; a REST API would be premature until the deferred iOS app is actually built | Engineering-level, consistent with "avoid unnecessary infrastructure" |

@@ -54,7 +54,7 @@ export default async function DoctorDetailPage({
                   </div>
                 </CardHeader>
                 <CardContent className="text-sm text-muted-foreground">
-                  For {consultation.illness.title}
+                  For {consultation.case.title}
                 </CardContent>
               </Card>
             </Link>

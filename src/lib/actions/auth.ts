@@ -30,7 +30,7 @@ export async function signIn(
     return { success: false, error: "Incorrect email or password" };
   }
 
-  redirect("/illnesses");
+  redirect("/cases");
 }
 
 export async function signOut(): Promise<void> {

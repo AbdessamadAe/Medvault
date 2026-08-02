@@ -11,7 +11,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "MedVault",
     short_name: "MedVault",
     description: "Personal medical records organizer.",
-    start_url: "/illnesses",
+    start_url: "/cases",
     display: "standalone",
     background_color: "#ffffff",
     theme_color: "#16803c",

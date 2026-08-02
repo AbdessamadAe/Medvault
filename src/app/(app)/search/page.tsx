@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { SearchIcon } from "lucide-react";
 
 const TYPE_LABEL: Record<string, string> = {
-  illness: "Illness",
+  case: "Case",
   doctor: "Doctor",
   consultation: "Consultation",
   "test-result": "Test Result",

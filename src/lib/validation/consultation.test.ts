@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { consultationSchema } from "./consultation";
 
 const validInput = {
-  illnessId: "d290f1ee-6c54-4b01-90e6-d701748f0851",
+  caseId: "d290f1ee-6c54-4b01-90e6-d701748f0851",
   doctorId: "d290f1ee-6c54-4b01-90e6-d701748f0852",
   date: "2026-01-15",
   reason: "Follow-up checkup",
@@ -14,9 +14,9 @@ describe("consultationSchema", () => {
     expect(consultationSchema.safeParse(validInput).success).toBe(true);
   });
 
-  it("requires illnessId and doctorId to be valid uuids", () => {
+  it("requires caseId and doctorId to be valid uuids", () => {
     expect(
-      consultationSchema.safeParse({ ...validInput, illnessId: "not-a-uuid" }).success,
+      consultationSchema.safeParse({ ...validInput, caseId: "not-a-uuid" }).success,
     ).toBe(false);
     expect(
       consultationSchema.safeParse({ ...validInput, doctorId: "not-a-uuid" }).success,

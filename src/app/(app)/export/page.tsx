@@ -10,9 +10,9 @@ export default function ExportPage() {
         <CardHeader>
           <CardTitle className="text-lg">Download everything</CardTitle>
           <CardDescription>
-            A zip file with every illness, doctor, consultation, prescription, and test
+            A zip file with every case, doctor, consultation, prescription, and test
             result as structured JSON, plus every original attached file organized by
-            illness and consultation.
+            case and consultation.
           </CardDescription>
         </CardHeader>
         <CardContent>

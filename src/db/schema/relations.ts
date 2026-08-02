@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm";
-import { illnesses } from "./illnesses";
+import { cases } from "./cases";
 import { doctors } from "./doctors";
 import { consultations } from "./consultations";
 import { prescriptions } from "./prescriptions";
@@ -12,7 +12,7 @@ import { attachments } from "./attachments";
 // never import each other in a cycle — they only import what they need for
 // foreign key columns.
 
-export const illnessesRelations = relations(illnesses, ({ many }) => ({
+export const casesRelations = relations(cases, ({ many }) => ({
   consultations: many(consultations),
 }));
 
@@ -21,9 +21,9 @@ export const doctorsRelations = relations(doctors, ({ many }) => ({
 }));
 
 export const consultationsRelations = relations(consultations, ({ one, many }) => ({
-  illness: one(illnesses, {
-    fields: [consultations.illnessId],
-    references: [illnesses.id],
+  case: one(cases, {
+    fields: [consultations.caseId],
+    references: [cases.id],
   }),
   doctor: one(doctors, {
     fields: [consultations.doctorId],

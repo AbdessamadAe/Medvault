@@ -31,7 +31,7 @@ Next.js 16 (App Router, TypeScript, Turbopack) · Tailwind v4 · shadcn/ui
 
 ## Folder conventions
 
-Every entity (Illness, Doctor, Consultation, Prescription, Medication, Test
+Every entity (Case, Doctor, Consultation, Prescription, Medication, Test
 Result) follows the same five-file shape. When adding a new entity, copy
 this pattern rather than inventing a new one:
 

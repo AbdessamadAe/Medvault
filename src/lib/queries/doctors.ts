@@ -15,7 +15,7 @@ export async function getDoctorWithHistory(ownerId: string, doctorId: string) {
     with: {
       consultations: {
         orderBy: (consultations, { desc }) => [desc(consultations.date)],
-        with: { illness: true },
+        with: { case: true },
       },
     },
   });

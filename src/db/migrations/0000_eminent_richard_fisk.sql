@@ -1,9 +1,9 @@
-CREATE TYPE "public"."illness_status" AS ENUM('active', 'resolved', 'chronic');--> statement-breakpoint
+CREATE TYPE "public"."case_status" AS ENUM('active', 'resolved', 'chronic');--> statement-breakpoint
 CREATE TYPE "public"."test_result_type" AS ENUM('lab', 'imaging');--> statement-breakpoint
-CREATE TABLE "illnesses" (
+CREATE TABLE "cases" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"title" text NOT NULL,
-	"status" "illness_status" DEFAULT 'active' NOT NULL,
+	"status" "case_status" DEFAULT 'active' NOT NULL,
 	"start_date" date,
 	"end_date" date,
 	"notes" text,
@@ -27,7 +27,7 @@ CREATE TABLE "doctors" (
 --> statement-breakpoint
 CREATE TABLE "consultations" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"illness_id" uuid NOT NULL,
+	"case_id" uuid NOT NULL,
 	"doctor_id" uuid NOT NULL,
 	"date" date NOT NULL,
 	"reason" text NOT NULL,
@@ -101,9 +101,9 @@ CREATE TABLE "attachments" (
       ) = 1)
 );
 --> statement-breakpoint
-ALTER TABLE "illnesses" ADD CONSTRAINT "illnesses_owner_id_users_id_fk" FOREIGN KEY ("owner_id") REFERENCES "auth"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "cases" ADD CONSTRAINT "cases_owner_id_users_id_fk" FOREIGN KEY ("owner_id") REFERENCES "auth"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "doctors" ADD CONSTRAINT "doctors_owner_id_users_id_fk" FOREIGN KEY ("owner_id") REFERENCES "auth"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "consultations" ADD CONSTRAINT "consultations_illness_id_illnesses_id_fk" FOREIGN KEY ("illness_id") REFERENCES "public"."illnesses"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "consultations" ADD CONSTRAINT "consultations_case_id_cases_id_fk" FOREIGN KEY ("case_id") REFERENCES "public"."cases"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "consultations" ADD CONSTRAINT "consultations_doctor_id_doctors_id_fk" FOREIGN KEY ("doctor_id") REFERENCES "public"."doctors"("id") ON DELETE restrict ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "consultations" ADD CONSTRAINT "consultations_owner_id_users_id_fk" FOREIGN KEY ("owner_id") REFERENCES "auth"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "prescriptions" ADD CONSTRAINT "prescriptions_consultation_id_consultations_id_fk" FOREIGN KEY ("consultation_id") REFERENCES "public"."consultations"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint

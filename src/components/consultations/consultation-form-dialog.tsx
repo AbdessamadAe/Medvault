@@ -27,17 +27,17 @@ import type { consultations } from "@/db/schema";
 const initialState = { success: false as const, error: "" };
 
 export function ConsultationFormDialog({
-  illnessId,
+  caseId,
   doctors,
   consultation,
 }: {
-  illnessId: string;
+  caseId: string;
   doctors: { id: string; name: string; specialty: string | null }[];
   consultation?: typeof consultations.$inferSelect;
 }) {
   const [open, setOpen] = useState(false);
   const action = consultation
-    ? updateConsultation.bind(null, consultation.id, illnessId)
+    ? updateConsultation.bind(null, consultation.id, caseId)
     : createConsultation;
   const [state, formAction] = useActionState(action, initialState);
 
@@ -56,7 +56,7 @@ export function ConsultationFormDialog({
           <DialogTitle>{consultation ? "Edit consultation" : "New consultation"}</DialogTitle>
         </DialogHeader>
         <form action={formAction} className="flex flex-col gap-4">
-          <input type="hidden" name="illnessId" value={illnessId} />
+          <input type="hidden" name="caseId" value={caseId} />
           <div className="flex flex-col gap-2">
             <Label htmlFor="doctorId">Doctor</Label>
             <Select name="doctorId" defaultValue={consultation?.doctorId}>

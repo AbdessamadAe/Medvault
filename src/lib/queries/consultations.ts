@@ -6,7 +6,7 @@ export async function getConsultationWithDetails(ownerId: string, consultationId
   return db.query.consultations.findFirst({
     where: and(eq(consultations.id, consultationId), eq(consultations.ownerId, ownerId)),
     with: {
-      illness: true,
+      case: true,
       doctor: true,
       prescriptions: {
         orderBy: (prescriptions, { desc }) => [desc(prescriptions.date)],

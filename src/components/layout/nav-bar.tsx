@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 import { LogOutIcon } from "lucide-react";
 
 const NAV_LINKS = [
-  { href: "/illnesses", label: "Illnesses" },
+  { href: "/cases", label: "Cases" },
   { href: "/doctors", label: "Doctors" },
   { href: "/search", label: "Search" },
   { href: "/export", label: "Export" },
@@ -20,7 +20,7 @@ export function NavBar() {
   return (
     <header className="border-b bg-card">
       <div className="mx-auto flex max-w-4xl items-center gap-6 px-4 py-3">
-        <Link href="/illnesses" className="font-semibold text-primary">
+        <Link href="/cases" className="font-semibold text-primary">
           MedVault
         </Link>
         <nav className="flex flex-1 items-center gap-1">

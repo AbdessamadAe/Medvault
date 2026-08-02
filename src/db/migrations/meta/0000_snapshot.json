@@ -1,11 +1,11 @@
 {
-  "id": "31520038-450c-42ad-98ac-aa7b5549a49a",
+  "id": "a60e552a-363a-4989-9a8f-43b97e4a935e",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
-    "public.illnesses": {
-      "name": "illnesses",
+    "public.cases": {
+      "name": "cases",
       "schema": "",
       "columns": {
         "id": {
@@ -23,7 +23,7 @@
         },
         "status": {
           "name": "status",
-          "type": "illness_status",
+          "type": "case_status",
           "typeSchema": "public",
           "primaryKey": false,
           "notNull": true,
@@ -70,9 +70,9 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "illnesses_owner_id_users_id_fk": {
-          "name": "illnesses_owner_id_users_id_fk",
-          "tableFrom": "illnesses",
+        "cases_owner_id_users_id_fk": {
+          "name": "cases_owner_id_users_id_fk",
+          "tableFrom": "cases",
           "tableTo": "users",
           "schemaTo": "auth",
           "columnsFrom": [
@@ -193,8 +193,8 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
-        "illness_id": {
-          "name": "illness_id",
+        "case_id": {
+          "name": "case_id",
           "type": "uuid",
           "primaryKey": false,
           "notNull": true
@@ -246,12 +246,12 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "consultations_illness_id_illnesses_id_fk": {
-          "name": "consultations_illness_id_illnesses_id_fk",
+        "consultations_case_id_cases_id_fk": {
+          "name": "consultations_case_id_cases_id_fk",
           "tableFrom": "consultations",
-          "tableTo": "illnesses",
+          "tableTo": "cases",
           "columnsFrom": [
-            "illness_id"
+            "case_id"
           ],
           "columnsTo": [
             "id"
@@ -814,8 +814,8 @@
     }
   },
   "enums": {
-    "public.illness_status": {
-      "name": "illness_status",
+    "public.case_status": {
+      "name": "case_status",
       "schema": "public",
       "values": [
         "active",

@@ -10,7 +10,7 @@ export const runtime = "nodejs";
 /**
  * On-demand personal data export: a zip containing the full structured
  * record set as JSON, plus every original attached file organized under
- * Illness / Consultation folders. This is the user-triggered counterpart to
+ * Case / Consultation folders. This is the user-triggered counterpart to
  * the weekly automated backup — it doubles as a portability guarantee.
  */
 export async function GET() {
@@ -21,15 +21,15 @@ export async function GET() {
   const zip = new JSZip();
   zip.file("data.json", JSON.stringify(data, null, 2));
 
-  for (const illness of data.illnesses) {
-    const illnessFolder = sanitizePathSegment(illness.title, illness.id);
+  for (const caseItem of data.cases) {
+    const caseFolder = sanitizePathSegment(caseItem.title, caseItem.id);
 
-    for (const consultation of illness.consultations) {
+    for (const consultation of caseItem.consultations) {
       const consultationFolder = `${consultation.date}_${sanitizePathSegment(
         consultation.doctor.name,
         consultation.doctorId,
       )}`;
-      const folderPath = `files/${illnessFolder}/${consultationFolder}`;
+      const folderPath = `files/${caseFolder}/${consultationFolder}`;
 
       const allAttachments = [
         ...consultation.attachments,

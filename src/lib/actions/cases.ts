@@ -4,14 +4,14 @@ import { and, eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { db } from "@/db";
-import { illnesses } from "@/db/schema";
-import { illnessSchema } from "@/lib/validation/illness";
+import { cases } from "@/db/schema";
+import { caseSchema } from "@/lib/validation/case";
 import { requireUserId } from "@/lib/auth";
 import { fieldErrorsFrom, type ActionResult } from "./types";
-import { purgeAttachmentsForIllness } from "./attachment-cascade";
+import { purgeAttachmentsForCase } from "./attachment-cascade";
 
-function parseIllnessForm(formData: FormData) {
-  return illnessSchema.safeParse({
+function parseCaseForm(formData: FormData) {
+  return caseSchema.safeParse({
     title: formData.get("title"),
     status: formData.get("status") || undefined,
     startDate: formData.get("startDate"),
@@ -20,12 +20,12 @@ function parseIllnessForm(formData: FormData) {
   });
 }
 
-export async function createIllness(
+export async function createCase(
   _prevState: ActionResult,
   formData: FormData,
 ): Promise<ActionResult> {
   const ownerId = await requireUserId();
-  const parsed = parseIllnessForm(formData);
+  const parsed = parseCaseForm(formData);
 
   if (!parsed.success) {
     return {
@@ -36,21 +36,21 @@ export async function createIllness(
   }
 
   const [created] = await db
-    .insert(illnesses)
+    .insert(cases)
     .values({ ...parsed.data, ownerId })
-    .returning({ id: illnesses.id });
+    .returning({ id: cases.id });
 
-  revalidatePath("/illnesses");
-  redirect(`/illnesses/${created.id}`);
+  revalidatePath("/cases");
+  redirect(`/cases/${created.id}`);
 }
 
-export async function updateIllness(
-  illnessId: string,
+export async function updateCase(
+  caseId: string,
   _prevState: ActionResult,
   formData: FormData,
 ): Promise<ActionResult> {
   const ownerId = await requireUserId();
-  const parsed = parseIllnessForm(formData);
+  const parsed = parseCaseForm(formData);
 
   if (!parsed.success) {
     return {
@@ -61,26 +61,26 @@ export async function updateIllness(
   }
 
   await db
-    .update(illnesses)
+    .update(cases)
     .set({ ...parsed.data, updatedAt: new Date() })
-    .where(and(eq(illnesses.id, illnessId), eq(illnesses.ownerId, ownerId)));
+    .where(and(eq(cases.id, caseId), eq(cases.ownerId, ownerId)));
 
-  revalidatePath(`/illnesses/${illnessId}`);
-  revalidatePath("/illnesses");
+  revalidatePath(`/cases/${caseId}`);
+  revalidatePath("/cases");
   return { success: true };
 }
 
-export async function deleteIllness(illnessId: string): Promise<void> {
+export async function deleteCase(caseId: string): Promise<void> {
   const ownerId = await requireUserId();
 
   // Delete the actual files first — the DB cascade below only removes rows,
   // it would otherwise orphan every attached file in Storage.
-  await purgeAttachmentsForIllness(ownerId, illnessId);
+  await purgeAttachmentsForCase(ownerId, caseId);
 
   await db
-    .delete(illnesses)
-    .where(and(eq(illnesses.id, illnessId), eq(illnesses.ownerId, ownerId)));
+    .delete(cases)
+    .where(and(eq(cases.id, caseId), eq(cases.ownerId, ownerId)));
 
-  revalidatePath("/illnesses");
-  redirect("/illnesses");
+  revalidatePath("/cases");
+  redirect("/cases");
 }

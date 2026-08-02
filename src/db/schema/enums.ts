@@ -1,6 +1,6 @@
 import { pgEnum } from "drizzle-orm/pg-core";
 
-export const illnessStatusEnum = pgEnum("illness_status", [
+export const caseStatusEnum = pgEnum("case_status", [
   "active",
   "resolved",
   "chronic",

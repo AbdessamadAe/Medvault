@@ -15,7 +15,7 @@
 -- Row Level Security on every table
 -- ---------------------------------------------------------------------
 
-alter table public.illnesses enable row level security;
+alter table public.cases enable row level security;
 alter table public.doctors enable row level security;
 alter table public.consultations enable row level security;
 alter table public.prescriptions enable row level security;
@@ -24,7 +24,7 @@ alter table public.prescription_medications enable row level security;
 alter table public.test_results enable row level security;
 alter table public.attachments enable row level security;
 
-create policy "owner_full_access" on public.illnesses
+create policy "owner_full_access" on public.cases
   for all to authenticated
   using (owner_id = (select auth.uid()))
   with check (owner_id = (select auth.uid()));

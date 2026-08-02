@@ -5,7 +5,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { deleteAttachmentFile } from "@/lib/storage";
 
 /**
- * Deleting an Illness/Consultation/Prescription/Test Result cascades at the
+ * Deleting a Case/Consultation/Prescription/Test Result cascades at the
  * database level, but that only removes rows — it does nothing to the
  * actual files sitting in Supabase Storage. Call one of these BEFORE the
  * database delete so files never get orphaned.
@@ -63,11 +63,11 @@ export async function purgeAttachmentsForConsultationIds(
   await purgeByStorageKeys(attachmentRows.map((row) => row.storageKey));
 }
 
-export async function purgeAttachmentsForIllness(ownerId: string, illnessId: string) {
+export async function purgeAttachmentsForCase(ownerId: string, caseId: string) {
   const consultationRows = await db
     .select({ id: consultations.id })
     .from(consultations)
-    .where(and(eq(consultations.illnessId, illnessId), eq(consultations.ownerId, ownerId)));
+    .where(and(eq(consultations.caseId, caseId), eq(consultations.ownerId, ownerId)));
 
   await purgeAttachmentsForConsultationIds(
     ownerId,

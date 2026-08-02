@@ -80,7 +80,7 @@ npm run backup         # run the same backup the weekly GitHub Action runs
 6. **Deploy to Vercel**: import the repo, set the environment variables
    listed in [docs/ENVIRONMENT.md](docs/ENVIRONMENT.md) under "Vercel", and
    deploy.
-7. **Verify**: sign in, create an Illness → Consultation → Prescription
+7. **Verify**: sign in, create a Case → Consultation → Prescription
    with a file attachment, view/download it, then delete it and confirm
    the file is gone from Supabase Storage (not just the database row).
 8. **Set up backups**: add the GitHub Actions secrets listed in

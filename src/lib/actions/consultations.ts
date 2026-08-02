@@ -12,7 +12,7 @@ import { purgeAttachmentsForConsultationIds } from "./attachment-cascade";
 
 function parseConsultationForm(formData: FormData) {
   return consultationSchema.safeParse({
-    illnessId: formData.get("illnessId"),
+    caseId: formData.get("caseId"),
     doctorId: formData.get("doctorId"),
     date: formData.get("date"),
     reason: formData.get("reason"),
@@ -40,13 +40,13 @@ export async function createConsultation(
     .values({ ...parsed.data, ownerId })
     .returning({ id: consultations.id });
 
-  revalidatePath(`/illnesses/${parsed.data.illnessId}`);
+  revalidatePath(`/cases/${parsed.data.caseId}`);
   redirect(`/consultations/${created.id}`);
 }
 
 export async function updateConsultation(
   consultationId: string,
-  illnessId: string,
+  caseId: string,
   _prevState: ActionResult,
   formData: FormData,
 ): Promise<ActionResult> {
@@ -67,13 +67,13 @@ export async function updateConsultation(
     .where(and(eq(consultations.id, consultationId), eq(consultations.ownerId, ownerId)));
 
   revalidatePath(`/consultations/${consultationId}`);
-  revalidatePath(`/illnesses/${illnessId}`);
+  revalidatePath(`/cases/${caseId}`);
   return { success: true };
 }
 
 export async function deleteConsultation(
   consultationId: string,
-  illnessId: string,
+  caseId: string,
 ): Promise<void> {
   const ownerId = await requireUserId();
 
@@ -83,6 +83,6 @@ export async function deleteConsultation(
     .delete(consultations)
     .where(and(eq(consultations.id, consultationId), eq(consultations.ownerId, ownerId)));
 
-  revalidatePath(`/illnesses/${illnessId}`);
-  redirect(`/illnesses/${illnessId}`);
+  revalidatePath(`/cases/${caseId}`);
+  redirect(`/cases/${caseId}`);
 }

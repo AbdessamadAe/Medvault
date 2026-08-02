@@ -9,12 +9,12 @@ tool — it stores and organizes information you enter yourself.
 - Web application (Next.js), responsive/installable as a PWA on iPhone home
   screen. Native iOS app is **deferred**, not excluded.
 - Single user, single manually-provisioned account. No public sign-up.
-- Record types: Illness, Doctor, Consultation, Prescription, Medication,
+- Record types: Case, Doctor, Consultation, Prescription, Medication,
   Test Result (labs + imaging combined). See schema below for the hierarchy.
 - File attachments: PDF, JPEG, HEIC, PNG, plain-text notes. Import via file
   picker only (no camera capture).
 - Basic free-text search across titles/notes/test names.
-- Browse-by-Illness and Browse-by-Doctor navigation.
+- Browse-by-Case and Browse-by-Doctor navigation.
 - Weekly automated backups (DB dump + storage files) to a separate location.
 - "Export all my data" (JSON + original files as a zip).
 - PWA installability (manifest, icons, home-screen install) — **not** the
@@ -34,8 +34,8 @@ tool — it stores and organizes information you enter yourself.
 ## Data model
 
 ```
-Illness (required root)
- └─ Consultation (requires Illness + Doctor)
+Case (required root)
+ └─ Consultation (requires Case + Doctor)
      ├─ Prescription (requires Consultation)
      │   └─ Medication (linked, many-to-many via prescription_medications)
      └─ Test Result (requires Consultation; type = lab | imaging)
@@ -48,9 +48,9 @@ Attachment — polymorphic-by-FK: belongs to exactly one of
 
 | Entity | Fields | Required | Optional |
 |---|---|---|---|
-| Illness | title, status (active/resolved/chronic), start_date, end_date, notes | title | status, dates, notes |
+| Case | title, status (active/resolved/chronic), start_date, end_date, notes | title | status, dates, notes |
 | Doctor | name, specialty, clinic, city, phone, notes | name | rest |
-| Consultation | date, illness_id, doctor_id, reason, notes | date, illness, doctor, reason | notes |
+| Consultation | date, case_id, doctor_id, reason, notes | date, case, doctor, reason | notes |
 | Prescription | date, consultation_id, notes | date, consultation, ≥1 medication | notes |
 | Medication | name, dosage, frequency, start_date, end_date, notes | name | rest |
 | Test Result | date, type (lab/imaging), test_name, consultation_id, result_notes | date, type, test_name, consultation | notes |

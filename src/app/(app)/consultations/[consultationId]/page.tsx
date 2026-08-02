@@ -40,10 +40,10 @@ export default async function ConsultationDetailPage({
       <div className="flex items-start justify-between gap-4">
         <div>
           <Link
-            href={`/illnesses/${consultation.illnessId}`}
+            href={`/cases/${consultation.caseId}`}
             className="text-sm text-muted-foreground hover:underline"
           >
-            ← {consultation.illness.title}
+            ← {consultation.case.title}
           </Link>
           <h1 className="text-2xl font-semibold">{consultation.reason}</h1>
           <p className="text-sm text-muted-foreground">
@@ -52,12 +52,12 @@ export default async function ConsultationDetailPage({
         </div>
         <div className="flex gap-2">
           <ConsultationFormDialog
-            illnessId={consultation.illnessId}
+            caseId={consultation.caseId}
             doctors={doctors}
             consultation={consultation}
           />
           <DeleteConfirmButton
-            action={deleteConsultation.bind(null, consultation.id, consultation.illnessId)}
+            action={deleteConsultation.bind(null, consultation.id, consultation.caseId)}
             itemLabel="this consultation"
             warnAboutChildren
           />
