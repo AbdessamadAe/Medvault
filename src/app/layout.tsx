@@ -24,6 +24,11 @@ export const metadata: Metadata = {
   },
 };
 
+// Runs functions in Frankfurt, next to the Supabase database
+// (aws-0-eu-central-1) instead of Vercel's US default — every DB round
+// trip otherwise crosses the Atlantic twice.
+export const preferredRegion = "fra1";
+
 export const viewport: Viewport = {
   themeColor: "#16803c",
   // Lets the page extend under the iPhone notch/home indicator so
