@@ -36,10 +36,12 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@aws-sdk/client-s3": "^3.1101.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "dotenv": "^17.4.2",
     "drizzle-kit": "^0.31.10",
     "eslint": "^9",
     "eslint-config-next": "16.2.12",

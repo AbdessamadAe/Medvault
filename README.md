@@ -1,36 +1,107 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# MedVault
 
-## Getting Started
+A private, single-user personal medical records organizer. Not for
+clinics, hospitals, insurers, or multiple users, and not a diagnostic or
+clinical decision-support tool — see [docs/SPEC.md](docs/SPEC.md) for the
+full approved scope and explicit exclusions.
 
-First, run the development server:
+Stack: Next.js (App Router) + TypeScript + Tailwind + shadcn/ui, Drizzle
+ORM, Supabase (Postgres + Auth + Storage), deployed to Vercel. See
+[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for how the pieces fit
+together and [docs/DECISION_LOG.md](docs/DECISION_LOG.md) for why they
+were chosen.
+
+## Documentation index
+
+| Doc | Contents |
+|---|---|
+| [docs/SPEC.md](docs/SPEC.md) | Approved scope, data model, security/backup requirements, cost |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | System diagram, request flows |
+| [docs/API.md](docs/API.md) | Server Actions / route handler reference |
+| [docs/ENVIRONMENT.md](docs/ENVIRONMENT.md) | Every environment variable, what uses it, where it's set |
+| [docs/BACKUP_RESTORE.md](docs/BACKUP_RESTORE.md) | Backup schedule, secrets, restore procedure |
+| [docs/DECISION_LOG.md](docs/DECISION_LOG.md) | Key decisions, options considered, approval status |
+| [docs/KNOWN_LIMITATIONS.md](docs/KNOWN_LIMITATIONS.md) | What's deliberately not built yet |
+| [CLAUDE.md](CLAUDE.md) | Codebase conventions for anyone (or any agent) extending this repo |
+
+## Local development
+
+Requirements: Node 22+, `pg_dump`/`pg_restore` on PATH if you'll test
+backups locally (`brew install postgresql` on macOS).
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+cp .env.example .env.local   # then fill in your Supabase project's values
+npm run dev                  # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+`npm run dev` needs a real Supabase project to do anything useful beyond
+the `/login` page — see Deployment below to provision one.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Other commands
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build         # production build (includes the TypeScript check)
+npm run lint           # eslint
+npm test               # vitest — validation schemas and pure logic
+npm run db:generate    # regenerate SQL migrations from src/db/schema
+npm run db:migrate     # apply migrations to MIGRATION_DATABASE_URL
+npm run db:studio      # browse the real database with Drizzle Studio
+npm run backup         # run the same backup the weekly GitHub Action runs
+```
 
-## Learn More
+## Deployment
 
-To learn more about Next.js, take a look at the following resources:
+1. **Create a Supabase project** (free tier). Note the project URL, anon
+   key, service role key, and both the pooled (6543) and direct (5432)
+   Postgres connection strings from Settings → Database.
+2. **Set local env vars**: copy `.env.example` to `.env.local` and fill in
+   the values from step 1 (see [docs/ENVIRONMENT.md](docs/ENVIRONMENT.md)
+   for what each one is for).
+3. **Run migrations**: `npm run db:migrate`.
+4. **Bootstrap security**: open the Supabase SQL editor and run
+   `src/db/rls-policies.sql` once — this enables Row Level Security on
+   every table and creates the private `medical-files` storage bucket
+   with its access policies.
+5. **Create your one account**: Supabase Dashboard → Authentication →
+   Users → Add user. There is no public sign-up route by design.
+6. **Deploy to Vercel**: import the repo, set the environment variables
+   listed in [docs/ENVIRONMENT.md](docs/ENVIRONMENT.md) under "Vercel", and
+   deploy.
+7. **Verify**: sign in, create an Illness → Consultation → Prescription
+   with a file attachment, view/download it, then delete it and confirm
+   the file is gone from Supabase Storage (not just the database row).
+8. **Set up backups**: add the GitHub Actions secrets listed in
+   [docs/BACKUP_RESTORE.md](docs/BACKUP_RESTORE.md), confirm the workflow
+   runs (you can trigger it manually via `workflow_dispatch` instead of
+   waiting for Monday), and **do at least one test restore** into a
+   throwaway Supabase project before trusting this as your real safety
+   net.
+9. **Install as a PWA on iPhone**: open the deployed site in Safari →
+   Share → Add to Home Screen. This is app installability only — there is
+   no offline data caching (by design; see docs/SPEC.md).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Rolling back
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **App**: redeploy a previous commit/deployment from the Vercel
+  dashboard.
+- **Database**: `drizzle-kit` migrations are forward-only in this repo;
+  to undo a schema change, write a new migration that reverses it, or
+  restore from a backup (see docs/BACKUP_RESTORE.md) if data has already
+  been affected.
 
-## Deploy on Vercel
+## Security notes
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Encryption in transit (TLS) and at rest (Supabase-managed), Row Level
+Security on every table, private storage bucket with 60-second signed
+URLs only, random (non-identifying) storage keys, server-side file-type
+and size validation, no medical content in logs, secrets only ever in
+environment variables. Full detail in
+[docs/SPEC.md](docs/SPEC.md#security-requirements).
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This app does not claim HIPAA, GDPR, or any other formal regulatory
+compliance — none of that has been separately assessed or certified.
+
+## Known limitations
+
+See [docs/KNOWN_LIMITATIONS.md](docs/KNOWN_LIMITATIONS.md).
