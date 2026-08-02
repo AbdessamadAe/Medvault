@@ -17,7 +17,21 @@ and again by Postgres Row Level Security.
 ## Doctors — `src/lib/actions/doctors.ts`, `src/lib/queries/doctors.ts`
 - `createDoctor`, `updateDoctor`, `deleteDoctor` (blocked if the doctor has
   consultations on file)
+- `createDoctorInline` — creates a doctor without redirecting, for the
+  "add a doctor without leaving the Consultation form" flow
 - `listDoctors`, `getDoctorWithHistory`
+
+## Maps lookup — `src/lib/actions/maps-lookup.ts`, `src/lib/maps-link.ts`
+- `lookupGoogleMapsLink(url)` — resolves short links, regex-parses the
+  place name + coordinates, reverse-geocodes the city via OpenStreetMap
+  Nominatim (free, no API key). Used by the Doctor form's "paste a Maps
+  link" pre-fill; never writes anything without the user reviewing it.
+
+## Suggestions — `src/lib/queries/suggestions.ts`
+- `getDoctorFieldSuggestions`, `getConsultationReasonSuggestions`,
+  `getMedicationNameSuggestions`, `getTestNameSuggestions` — distinct
+  values the user has already entered, powering the `<datalist>`
+  suggestion dropdowns (see `src/components/datalist-input.tsx`)
 
 ## Consultations — `src/lib/actions/consultations.ts`, `src/lib/queries/consultations.ts`
 - `createConsultation`, `updateConsultation`, `deleteConsultation`

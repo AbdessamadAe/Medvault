@@ -26,6 +26,13 @@
 - **Supabase free-tier project pauses after 7 days of inactivity**,
   causing a short cold-start delay on the next request. Not a data-loss
   risk, just a UX quirk of the free tier.
+- **Google Maps link extraction is best-effort, not guaranteed.** It only
+  ever gets a place name and/or city (via free URL parsing + OpenStreetMap
+  reverse geocoding) — never a phone number or full street address, and
+  a link with no place name/coordinates in it (e.g. a bare search results
+  page) yields nothing. The extracted "name" is usually the clinic/practice
+  name from the map pin, not necessarily the doctor's personal name —
+  always shown as an editable pre-fill for review, never saved directly.
 - **Single hardcoded owner per row via `owner_id`.** This is intentional
   for a single-user app, not a partial multi-tenancy implementation —
   extending to multiple users would require rethinking the RLS policies

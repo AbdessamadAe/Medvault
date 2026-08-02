@@ -24,6 +24,11 @@ tool — it stores and organizes information you enter yourself.
   reason, medication name, and test name (suggested from the user's own
   previously-entered values). Creating a Consultation lets you add a new
   doctor (name + specialty) inline, without leaving the form.
+- Paste a Google Maps link on the Doctor form to pre-fill clinic name and
+  city (free: URL parsing + OpenStreetMap reverse geocoding, no account
+  or API key). Doesn't extract phone number or a full street address —
+  those aren't reliably present in the link itself. Always shown as an
+  editable pre-fill, never saved without review.
 - Weekly automated backups (DB dump + storage files) to a separate location.
 - "Export all my data" (JSON + original files as a zip).
 - PWA installability (manifest, icons, home-screen install) — **not** the
