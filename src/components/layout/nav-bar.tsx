@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { signOut } from "@/lib/actions/auth";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { LogOutIcon } from "lucide-react";
 
 /** Slim top bar — brand + sign out only. Primary navigation lives in BottomTabBar. */
@@ -15,11 +16,14 @@ export function NavBar() {
           <Image src="/logo.png" alt="" width={24} height={24} className="rounded-md" priority />
           MedVault
         </Link>
-        <form action={signOut}>
-          <Button type="submit" variant="ghost" size="icon" aria-label="Sign out">
-            <LogOutIcon className="size-4" />
-          </Button>
-        </form>
+        <div className="flex items-center gap-1">
+          <ThemeToggle />
+          <form action={signOut}>
+            <Button type="submit" variant="ghost" size="icon" aria-label="Sign out">
+              <LogOutIcon className="size-4" />
+            </Button>
+          </form>
+        </div>
       </div>
     </header>
   );
