@@ -1,119 +1,122 @@
-# MedVault
+<div align="center">
+  <img src="public/logo.png" alt="MedVault logo" width="96" />
+  <h1>MedVault</h1>
+  <p><strong>A private, mobile-first medical-record organizer built for my personal use in Morocco.</strong></p>
+  <p>Cases, consultations, prescriptions, test results, doctors, and supporting documents in one single-user app.</p>
 
-A private, single-user personal medical records organizer. Not for
-clinics, hospitals, insurers, or multiple users, and not a diagnostic or
-clinical decision-support tool — see [docs/SPEC.md](docs/SPEC.md) for the
-full approved scope and explicit exclusions.
+  <p>
+    <img src="https://img.shields.io/badge/Next.js-App_Router-000000?logo=nextdotjs" alt="Next.js" />
+    <img src="https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white" alt="TypeScript" />
+    <img src="https://img.shields.io/badge/Supabase-Postgres_&_Auth-3FCF8E?logo=supabase&logoColor=white" alt="Supabase" />
+    <img src="https://img.shields.io/badge/Drizzle-ORM-C5F74F?logo=drizzle&logoColor=black" alt="Drizzle ORM" />
+    <img src="https://img.shields.io/badge/PWA-Mobile_first-5A0FC8?logo=pwa&logoColor=white" alt="PWA" />
+  </p>
+</div>
 
-Stack: Next.js (App Router) + TypeScript + Tailwind + shadcn/ui, Drizzle
-ORM, Supabase (Postgres + Auth + Storage), deployed to Vercel. See
-[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for how the pieces fit
-together and [docs/DECISION_LOG.md](docs/DECISION_LOG.md) for why they
-were chosen.
+> [!IMPORTANT]
+> MedVault is a private, single-user personal project. It is not intended for clinics, hospitals, insurers, or multiple users, and it is not a diagnostic or clinical decision-support tool. Public registration is disabled by design.
 
-## Documentation index
+## Product tour
 
-| Doc | Contents |
-|---|---|
-| [docs/SPEC.md](docs/SPEC.md) | Approved scope, data model, security/backup requirements, cost |
-| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | System diagram, request flows |
-| [docs/API.md](docs/API.md) | Server Actions / route handler reference |
-| [docs/ENVIRONMENT.md](docs/ENVIRONMENT.md) | Every environment variable, what uses it, where it's set |
-| [docs/BACKUP_RESTORE.md](docs/BACKUP_RESTORE.md) | Backup schedule, secrets, restore procedure |
-| [docs/DECISION_LOG.md](docs/DECISION_LOG.md) | Key decisions, options considered, approval status |
-| [docs/KNOWN_LIMITATIONS.md](docs/KNOWN_LIMITATIONS.md) | What's deliberately not built yet |
-| [CLAUDE.md](CLAUDE.md) | Codebase conventions for anyone (or any agent) extending this repo |
+The screenshots below use entirely fictional demo data.
+
+| Case overview | Case timeline | Consultation and test result | Doctor history |
+|---|---|---|---|
+| <img src="docs/screenshots/case-overview.png" alt="Filtered case overview on mobile" width="220" /> | <img src="docs/screenshots/case-detail.png" alt="Case timeline on mobile" width="220" /> | <img src="docs/screenshots/consultation-detail.png" alt="Consultation and test result on mobile" width="220" /> | <img src="docs/screenshots/doctor-profile.png" alt="Doctor profile and consultation history on mobile" width="220" /> |
+
+## Why I built it
+
+Medical information can easily become scattered across paper prescriptions, laboratory reports, messages, and separate clinic visits. I built MedVault for my own day-to-day use in Morocco: one private account, fast mobile data entry after appointments, and a clear timeline of how each consultation, prescription, result, and file relates to a health case.
+
+The application is deployed privately. Visitors cannot create an account or view any records; the interface above is shown with fictional portfolio data.
+
+## What it does
+
+- Organizes records as **Case → Consultation → Prescription / Test Result**
+- Maintains a reusable doctor directory with specialty, clinic, city, phone, notes, and an optional Google Maps link
+- Filters cases by broad body system and supports free-text search across titles, notes, and test names
+- Stores PDFs, images, HEIC files, and text attachments in a private Supabase bucket
+- Generates short-lived signed URLs instead of exposing public file links
+- Exports all structured data and original files as a portable ZIP archive
+- Runs weekly database-and-storage backups to a separate Backblaze B2 bucket
+- Installs on an iPhone home screen as a mobile-first PWA
+
+## Architecture
+
+```mermaid
+flowchart LR
+    A[Mobile browser / PWA] --> B[Next.js on Vercel]
+    B --> C[Server Actions]
+    C --> D[Supabase Auth]
+    C --> E[Postgres + Row Level Security]
+    C --> F[Private Supabase Storage]
+    G[Weekly GitHub Action] --> H[Encrypted backup in Backblaze B2]
+```
+
+The UI uses the Next.js App Router, TypeScript, Tailwind CSS, and shadcn/ui. Drizzle ORM owns the schema and migrations, while Supabase provides authentication, Postgres, and private object storage. See [the architecture document](docs/ARCHITECTURE.md) for the request flows and [the decision log](docs/DECISION_LOG.md) for the trade-offs behind the stack.
+
+## Privacy and security choices
+
+- One manually provisioned account with no public sign-up route
+- Row Level Security enabled on every application table
+- Private storage bucket with 60-second signed URLs
+- Random storage keys that do not reveal original filenames
+- Server-side file-type validation and a 25 MB upload limit
+- No medical-record content written to application logs
+- Secrets stored only in environment variables
+- Documented backup and restore procedure
+
+MedVault does **not** claim HIPAA, GDPR, or any other formal regulatory compliance. The project has not been independently assessed or certified.
 
 ## Local development
 
-Requirements: Node 22+, `pg_dump`/`pg_restore` on PATH if you'll test
-backups locally (`brew install postgresql` on macOS).
+Requirements: Node.js 22+ and a Supabase project. Install `pg_dump` and `pg_restore` as well if you want to test backups locally.
 
 ```bash
 npm install
-cp .env.example .env.local   # then fill in your Supabase project's values
-npm run dev                  # http://localhost:3000
+cp .env.example .env.local
+npm run db:migrate
+npm run dev
 ```
 
-`npm run dev` needs a real Supabase project to do anything useful beyond
-the `/login` page — see Deployment below to provision one.
+Open [http://localhost:3000](http://localhost:3000). Environment variables are documented in [docs/ENVIRONMENT.md](docs/ENVIRONMENT.md).
 
-### Other commands
+### Useful commands
 
 ```bash
-npm run build         # production build (includes the TypeScript check)
-npm run lint           # eslint
-npm test               # vitest — validation schemas and pure logic
-npm run db:generate    # regenerate SQL migrations from src/db/schema
-npm run db:migrate     # apply migrations to MIGRATION_DATABASE_URL
-npm run db:studio      # browse the real database with Drizzle Studio
-npm run backup         # run the same backup the weekly GitHub Action runs
+npm run build         # production build and TypeScript check
+npm run lint          # ESLint
+npm test              # Vitest unit and logic tests
+npm run db:generate   # generate SQL migrations
+npm run db:migrate    # apply migrations
+npm run db:studio     # inspect the database with Drizzle Studio
+npm run backup        # run the backup workflow locally
 ```
 
-## Deployment
+## Deployment outline
 
-1. **Create a Supabase project** (free tier). From Settings → API Keys,
-   note the project URL, `publishable_key` (→
-   `NEXT_PUBLIC_SUPABASE_ANON_KEY`), and `secret_key` (→
-   `SUPABASE_SERVICE_ROLE_KEY`) — Supabase renamed the legacy anon/
-   service_role keys to these. From Settings → Database, note the
-   **Transaction pooler** string (→ `DATABASE_URL`) and the **Session
-   pooler** string (→ `MIGRATION_DATABASE_URL`). Use the Session pooler,
-   not "Direct connection", for `MIGRATION_DATABASE_URL` — the direct
-   connection is IPv6-only unless you've paid for Supabase's IPv4 add-on,
-   which hangs/times out from most IPv4-only environments (CI runners,
-   some sandboxes, etc).
-2. **Set local env vars**: copy `.env.example` to `.env.local` and fill in
-   the values from step 1 (see [docs/ENVIRONMENT.md](docs/ENVIRONMENT.md)
-   for what each one is for).
-3. **Run migrations**: `npm run db:migrate`.
-4. **Bootstrap security**: `npx tsx scripts/run-sql.ts src/db/rls-policies.sql`
-   — enables Row Level Security on every table and creates the private
-   `medical-files` storage bucket with its access policies. Sanity-check
-   with `npx tsx scripts/verify-rls.ts` (confirms RLS is on for all 8
-   tables, the bucket exists and is private, and all policies are
-   present).
-5. **Create your one account**: Supabase Dashboard → Authentication →
-   Users → Add user (check "Auto Confirm User"). There is no public
-   sign-up route by design — pick your own email/password directly in the
-   dashboard rather than sharing it anywhere else.
-6. **Deploy to Vercel**: import the repo, set the environment variables
-   listed in [docs/ENVIRONMENT.md](docs/ENVIRONMENT.md) under "Vercel", and
-   deploy.
-7. **Verify**: sign in, create a Case → Consultation → Prescription
-   with a file attachment, view/download it, then delete it and confirm
-   the file is gone from Supabase Storage (not just the database row).
-8. **Set up backups**: add the GitHub Actions secrets listed in
-   [docs/BACKUP_RESTORE.md](docs/BACKUP_RESTORE.md), confirm the workflow
-   runs (you can trigger it manually via `workflow_dispatch` instead of
-   waiting for Monday), and **do at least one test restore** into a
-   throwaway Supabase project before trusting this as your real safety
-   net.
-9. **Install as a PWA on iPhone**: open the deployed site in Safari →
-   Share → Add to Home Screen. This is app installability only — there is
-   no offline data caching (by design; see docs/SPEC.md).
+1. Create a Supabase project and configure the database, authentication, and storage environment variables.
+2. Run the Drizzle migrations.
+3. Apply `src/db/rls-policies.sql` to enable RLS and create the private storage bucket.
+4. Verify the policies with `npx tsx scripts/verify-rls.ts`.
+5. Manually provision the single user in Supabase Auth.
+6. Deploy the Next.js application to Vercel.
+7. Configure the weekly encrypted backup workflow and complete a test restore.
 
-## Rolling back
+The complete setup procedure is documented in [docs/ENVIRONMENT.md](docs/ENVIRONMENT.md) and [docs/BACKUP_RESTORE.md](docs/BACKUP_RESTORE.md).
 
-- **App**: redeploy a previous commit/deployment from the Vercel
-  dashboard.
-- **Database**: `drizzle-kit` migrations are forward-only in this repo;
-  to undo a schema change, write a new migration that reverses it, or
-  restore from a backup (see docs/BACKUP_RESTORE.md) if data has already
-  been affected.
+## Documentation
 
-## Security notes
+| Document | Contents |
+|---|---|
+| [Product specification](docs/SPEC.md) | Approved scope, exclusions, data model, and security requirements |
+| [Architecture](docs/ARCHITECTURE.md) | System diagram and request flows |
+| [API reference](docs/API.md) | Server Actions and route handlers |
+| [Environment](docs/ENVIRONMENT.md) | Environment variables and deployment configuration |
+| [Backup and restore](docs/BACKUP_RESTORE.md) | Backup schedule, secrets, retention, and recovery |
+| [Decision log](docs/DECISION_LOG.md) | Important technical decisions and alternatives considered |
+| [Known limitations](docs/KNOWN_LIMITATIONS.md) | Deliberately deferred functionality |
 
-Encryption in transit (TLS) and at rest (Supabase-managed), Row Level
-Security on every table, private storage bucket with 60-second signed
-URLs only, random (non-identifying) storage keys, server-side file-type
-and size validation, no medical content in logs, secrets only ever in
-environment variables. Full detail in
-[docs/SPEC.md](docs/SPEC.md#security-requirements).
+## Deliberate boundaries
 
-This app does not claim HIPAA, GDPR, or any other formal regulatory
-compliance — none of that has been separately assessed or certified.
-
-## Known limitations
-
-See [docs/KNOWN_LIMITATIONS.md](docs/KNOWN_LIMITATIONS.md).
+MedVault does not include OCR, AI interpretation, diagnosis or treatment suggestions, reminders, public sharing, multi-user access, camera scanning, or offline caching of medical data. These boundaries keep the project focused on private organization rather than clinical decision-making.
